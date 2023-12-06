@@ -5,7 +5,7 @@ import 'package:fake_store_api/network/data_agent/fake_store_data_agent.dart';
 import 'package:fake_store_api/network/data_agent/fake_store_data_agent_impl.dart';
 
 class FakeStoreModelImpl extends FakeStoreModel{
-  FakeStoreDataAgent _dataAgent = FakeStoreDataAgentImpl() ;
+  final FakeStoreDataAgent _dataAgent = FakeStoreDataAgentImpl() ;
 
   FakeStoreModelImpl._();
 

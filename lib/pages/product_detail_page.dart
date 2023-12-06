@@ -1,39 +1,41 @@
- import 'package:fake_store_api/data/model/fake_store_model.dart';
-import 'package:fake_store_api/data/model/fake_store_model_impl.dart';
+ import 'package:fake_store_api/bloc/cart_bloc.dart';
+import 'package:fake_store_api/bloc/detail_page_bloc.dart';
 import 'package:fake_store_api/data/vos/product_vo/product_vo.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-FakeStoreModel _product = FakeStoreModelImpl();
+
 class ProductDetailPage extends StatelessWidget {
    const ProductDetailPage({super.key, required this.id});
 
     final int  id;
    @override
    Widget build(BuildContext context) {
-     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Product"),
-      ),
-      body: FutureBuilder(
-        future: _product.getOneProduct(id), 
-        builder: (context,snapShot){
-          if(snapShot.connectionState == ConnectionState.waiting){
-            return const Center(child: CircularProgressIndicator(),);
-          }
-          if(snapShot.hasError){
-            return Center(child: Text("${snapShot.error}"),);
-          }
-          final result = snapShot.data;
-          return ProductDetailView(productVO: result,);
-        })
-      );
-   }
+        return ChangeNotifierProvider<ProductDetailBloc>(
+          create: (_)=>ProductDetailBloc(id),
+          child: Scaffold(
+          appBar: AppBar(
+            title: const Text("Product"),
+          ),
+          body: Selector<ProductDetailBloc,ProductVO ?>(
+            selector: (_,bloc)=> bloc.getOneProduct,
+            builder: (_,value,__){
+              if(value == null){
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              return ProductDetailView(productVO: value,);
+            })
+          ),
+        );
+      }
  }
 
  class ProductDetailView extends StatelessWidget {
-   const ProductDetailView({super.key, this.productVO});
+   const ProductDetailView({super.key, required this.productVO});
 
-   final  ProductVO ? productVO;
+   final  ProductVO  productVO;
  
    @override
    Widget build(BuildContext context) {
@@ -44,21 +46,18 @@ class ProductDetailPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ProductImageView(image: productVO?.image ??""),
-                ProductPriceView(price: productVO?.price ?? 12),
+                ProductImageView(image: productVO.image),
+                ProductPriceView(price: productVO.price),
                 const ProductDetailHeadTextView(headText: "Description"),
-                ProductDescriptionView(description: productVO?.description ?? ""),
+                ProductDescriptionView(description: productVO.description ),
                 const ProductDetailHeadTextView(headText: "Category"),
-                ProductCategoryView(category: productVO?.category ?? "",),
+                ProductCategoryView(category: productVO.category,),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: ElevatedButton(onPressed: (){}, 
-                  child: const Center(
-                    child: Text("Buy",style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18
-                    ),),
-                  ),
+                  child: ElevatedButton(onPressed: (){
+                    final bloc = context.read<CartBloc>();
+                    bloc.addToCart(productVO);
+                  }, 
                   style: ButtonStyle(
                     minimumSize: MaterialStateProperty.all<Size>(
                       Size(MediaQuery.of(context).size.width, 50)
@@ -66,6 +65,12 @@ class ProductDetailPage extends StatelessWidget {
                     backgroundColor: MaterialStateProperty.all<Color>(
                     Colors.yellow
                     )
+                  ),
+                  child: const Center(
+                    child: Text("Buy",style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18
+                    ),),
                   ),
                   ),
                 )

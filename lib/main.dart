@@ -1,16 +1,24 @@
-import 'package:fake_store_api/data/model/fake_store_model.dart';
-import 'package:fake_store_api/network/data_agent/fake_store_data_agent.dart';
-import 'package:fake_store_api/network/data_agent/fake_store_data_agent_impl.dart';
+import 'package:fake_store_api/bloc/cart_bloc.dart';
+import 'package:fake_store_api/bloc/home_page_product_bloc.dart';
 import 'package:fake_store_api/pages/home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import 'data/model/fake_store_model_impl.dart';
+
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(providers:[
+      ChangeNotifierProvider(create: (_)=> HomePageProductBloc()),
+      ChangeNotifierProvider(create: (_)=> CartBloc()),
+    ] ,
+    child: const MyApp(),)
+    );
 
-  FakeStoreDataAgent _data = FakeStoreDataAgentImpl();
-  _data.getOneProduct(2).then((value) => print(value));
+  // FakeStoreModel _model = FakeStoreModelImpl();
+  // _model.getAllProducts().then((value) => print(value));
+  // FakeStoreDataAgent _data = FakeStoreDataAgentImpl();
+  // _data.getOneProduct(1).then((value) => print(value));
 }
 
 class MyApp extends StatelessWidget {
