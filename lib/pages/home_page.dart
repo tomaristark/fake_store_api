@@ -60,10 +60,12 @@ class ProductCard extends StatelessWidget {
     super.key,
     required this.productVO,
     this.hasRemove = false,
+    this.onPressed,
   });
 
   final ProductVO? productVO;
   final bool hasRemove;
+  final Function(ProductVO) ? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +93,12 @@ class ProductCard extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         trailing: (hasRemove)
-            ? IconButton(onPressed: () {}, icon: const Icon(Icons.close))
+            ? IconButton(
+              onPressed:(){
+                if(onPressed != null){
+                  onPressed!(productVO!);
+                }
+            }, icon: const Icon(Icons.close))
             : null,
       ),
     );

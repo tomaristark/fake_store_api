@@ -8,7 +8,7 @@ class CartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<CartBloc>();
+    final bloc = Provider.of<CartBloc>(context);
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -17,7 +17,10 @@ class CartPage extends StatelessWidget {
         body: ListView.builder(
             itemCount: bloc.cartProducts.length,
             itemBuilder: (context, index) {
-              return ProductCard(productVO: bloc.cartProducts[index]);
+              return ProductCard(productVO: bloc.cartProducts[index],hasRemove: true,
+              onPressed: (product){
+                bloc.removeFromCart(product);
+              },);
             }));
   }
 }
